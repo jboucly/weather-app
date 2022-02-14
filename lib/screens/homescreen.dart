@@ -2,7 +2,14 @@ import 'dart:core';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 
+import '../serializers/album.dart';
+
 class HomeScreen extends StatelessWidget {
+  BuildContext context;
+  Future<Album> futureAlbum;
+
+  HomeScreen(this.context, this.futureAlbum, {Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +28,7 @@ class HomeScreen extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Colors.grey.shade900,
+              Colors.grey.shade500,
               Colors.black,
             ],
             begin: Alignment.topCenter,
@@ -34,6 +41,7 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _dataLoader(),
               _cloudIcon(),
               _temperature(),
               _location(),
@@ -44,6 +52,22 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  _dataLoader() {
+    return FutureBuilder<Album>(
+      future: futureAlbum,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Text(snapshot.data!.title);
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+
+        // By default, show a loading spinner.
+        return const CircularProgressIndicator();
+      },
     );
   }
 
